@@ -1,4 +1,4 @@
-# Alvarium – Acompanhamento e Conversão de Criptomoedas
+# Acompanhamento e Conversão de Criptomoedas
 
 **CryptoTrack** é um aplicativo mobile desenvolvido em **Kotlin** utilizando **Jetpack Compose** para criar uma interface moderna, fluida e intuitiva.
 O objetivo do projeto é permitir que qualquer usuário acompanhe, em tempo real, o valor das principais criptomoedas e realize conversões rápidas para moedas tradicionais, tudo de forma simples e acessível.
