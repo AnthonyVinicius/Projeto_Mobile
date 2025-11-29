@@ -1,0 +1,36 @@
+package br.edu.ifpe.alvarium.data.local
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import br.edu.ifpe.alvarium.data.local.dao.CoinDao
+import br.edu.ifpe.alvarium.data.local.entity.CoinEntity
+
+@Database(
+    entities = [CoinEntity::class],
+    version = 1,
+    exportSchema = false
+)
+abstract class AppDatabase : RoomDatabase() {
+
+    abstract fun coinDao(): CoinDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
+
+        fun getInstance(context: Context): AppDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java,
+                    "alvarium.db"
+                ).build()
+
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
+}
