@@ -38,8 +38,7 @@ fun AlvariumBottomBar(
         val items = listOf(
             BottomNavItem.Home,
             BottomNavItem.Search,
-            BottomNavItem.Favorites,
-            BottomNavItem.Settings
+            BottomNavItem.Favorites
         )
 
         Row(
