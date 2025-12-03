@@ -74,7 +74,7 @@ private fun MainScreenContent(
     )
 
     Button(
-        onClick = { viewModel.loadCoins() },
+        onClick = {},
         modifier = Modifier.fillMaxWidth()
     ) {
         Text("Atualizar")

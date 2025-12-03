@@ -1,9 +1,11 @@
 package br.edu.ifpe.alvarium.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.edu.ifpe.alvarium.domain.model.Coin
 import br.edu.ifpe.alvarium.domain.repository.ICoinRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,12 +18,20 @@ class CoinViewModel(
     val coins: StateFlow<List<Coin>> = _coins
 
     init {
-        loadCoins()
+        startAutoFetch()
     }
 
-    fun loadCoins() {
+    private fun startAutoFetch() {
         viewModelScope.launch {
-            _coins.value = repository.getCoins()
+            while (true) {
+                loadCoins()
+                delay(5000)
+            }
         }
+    }
+
+    private suspend fun loadCoins() {
+        Log.d("CoinViewModel", "Carregando moedas...")
+        _coins.value = repository.getCoins()
     }
 }
