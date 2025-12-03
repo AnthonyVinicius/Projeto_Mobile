@@ -1,17 +1,17 @@
 package br.edu.ifpe.alvarium.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import br.edu.ifpe.alvarium.ui.screens.main.MainScreen
-import androidx.navigation.NavType
-import br.edu.ifpe.alvarium.ui.screens.details.DetailsScreen
 import br.edu.ifpe.alvarium.ui.screens.converter.ConverterScreen
+import br.edu.ifpe.alvarium.ui.screens.details.DetailsScreen
 import br.edu.ifpe.alvarium.ui.screens.favorites.FavoritesScreen
-
+import br.edu.ifpe.alvarium.ui.screens.main.MainScreen
 
 
 @Composable
@@ -42,15 +42,15 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         }
 
         composable(
-            route = AppRoute.DetailsScreen.path,
-            arguments = listOf(
-                navArgument(AppRoute.DetailsScreen.ARG) {
-                    type = NavType.StringType
-                }
-            )
+            route = "details/{coinId}",
+            arguments = listOf(navArgument("coinId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val acronym = backStackEntry.arguments?.getString(AppRoute.DetailsScreen.ARG) ?: ""
-            DetailsScreen(acronym)
+            val coinId = backStackEntry.arguments?.getString("coinId") ?: ""
+            DetailsScreen(
+                coinId = coinId,
+                context = LocalContext.current,
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

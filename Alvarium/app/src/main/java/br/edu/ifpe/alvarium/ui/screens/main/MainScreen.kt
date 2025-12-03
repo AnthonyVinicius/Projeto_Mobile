@@ -19,7 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import br.edu.ifpe.alvarium.viewmodel.CoinViewModel
 import br.edu.ifpe.alvarium.ui.components.CriptoCard
 import br.edu.ifpe.alvarium.ui.theme.AlvariumTheme
-import br.edu.ifpe.alvarium.viewmodel.CoinViewModelFactory
+import br.edu.ifpe.alvarium.viewmodel.factory.AppViewModelFactory
 
 @Composable
 fun MainScreen(
@@ -52,8 +52,8 @@ private fun MainScreenContent(
     onNavigateToDetails: (String) -> Unit
 ) {
     val context = LocalContext.current
-    val viewModel: CoinViewModel =
-        viewModel(factory = CoinViewModelFactory(context))
+    val factory = AppViewModelFactory(context)
+    val viewModel: CoinViewModel = viewModel(factory = factory)
 
     val coins by viewModel.coins.collectAsState()
 

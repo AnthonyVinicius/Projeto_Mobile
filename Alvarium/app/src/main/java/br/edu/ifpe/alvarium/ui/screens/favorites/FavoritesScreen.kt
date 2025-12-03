@@ -23,10 +23,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import br.edu.ifpe.alvarium.viewmodel.CoinViewModel
-import br.edu.ifpe.alvarium.viewmodel.CoinViewModelFactory
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.asPaddingValues
+import br.edu.ifpe.alvarium.viewmodel.factory.AppViewModelFactory
 
 @Composable
 fun FavoritesScreen(onNavigateToDetails: (String) -> Unit) {
@@ -51,8 +51,8 @@ fun FavoritesScreen(onNavigateToDetails: (String) -> Unit) {
         ) {
 
             val context = LocalContext.current
-            val viewModel: CoinViewModel =
-                viewModel(factory = CoinViewModelFactory(context))
+            val factory = AppViewModelFactory(context)
+            val viewModel: CoinViewModel = viewModel(factory = factory)
             val coins by viewModel.coins.collectAsState()
 
             Text(
