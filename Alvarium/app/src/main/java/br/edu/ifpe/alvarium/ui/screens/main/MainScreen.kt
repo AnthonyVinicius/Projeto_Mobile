@@ -19,6 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import br.edu.ifpe.alvarium.viewmodel.CoinViewModel
 import br.edu.ifpe.alvarium.ui.components.CriptoCard
 import br.edu.ifpe.alvarium.ui.theme.AlvariumTheme
+import br.edu.ifpe.alvarium.viewmodel.FavoriteCoinViewModel
 import br.edu.ifpe.alvarium.viewmodel.factory.AppViewModelFactory
 
 @Composable
@@ -54,6 +55,7 @@ private fun MainScreenContent(
     val context = LocalContext.current
     val factory = AppViewModelFactory(context)
     val viewModel: CoinViewModel = viewModel(factory = factory)
+    val favoriteViewModel : FavoriteCoinViewModel =  viewModel(factory =  factory)
 
     val coins by viewModel.coins.collectAsState()
 
@@ -113,7 +115,11 @@ private fun MainScreenContent(
                     name = coin.name,
                     acronym = coin.symbol.uppercase(),
                     price = "US$ ${coin.currentPrice}",
-                    imageUrl = coin.image
+                    imageUrl = coin.image,
+                    isFavorite = favoriteViewModel.isFavoriteState(coin.id),
+                    onToggleFavorite = {
+                        favoriteViewModel.toggleFavorite(coin)
+                    }
                 ) {
                     onNavigateToDetails(coin.id)
                 }
