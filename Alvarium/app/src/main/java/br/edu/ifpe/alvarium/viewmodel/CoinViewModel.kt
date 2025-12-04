@@ -25,13 +25,18 @@ class CoinViewModel(
         viewModelScope.launch {
             while (true) {
                 loadCoins()
-                delay(5000)
+                delay(30000)
             }
         }
     }
 
     private suspend fun loadCoins() {
-        Log.d("CoinViewModel", "Carregando moedas...")
-        _coins.value = repository.getCoins()
+        try {
+            Log.d("CoinViewModel", "Carregando moedas...")
+            _coins.value = repository.getCoins()
+        } catch (e: Exception) {
+            Log.e("CoinViewModel", "Erro: ${e.message}")
+            delay(30000)
+        }
     }
 }

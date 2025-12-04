@@ -1,8 +1,6 @@
 package br.edu.ifpe.alvarium.ui.screens.details
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -11,12 +9,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import br.edu.ifpe.alvarium.ui.components.CoinChartWithGrid
+import br.edu.ifpe.alvarium.ui.components.details.CoinChartWithGrid
 import br.edu.ifpe.alvarium.viewmodel.DetailsViewModel
 import br.edu.ifpe.alvarium.viewmodel.CoinViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import br.edu.ifpe.alvarium.viewmodel.factory.AppViewModelFactory
 import android.content.Context
+import br.edu.ifpe.alvarium.ui.components.details.TimeSelector
+import coil.compose.AsyncImage
 
 @Composable
 fun DetailsScreen(
@@ -29,19 +29,25 @@ fun DetailsScreen(
     val detailsViewModel: DetailsViewModel = viewModel(factory = factory)
 
     val coins by coinViewModel.coins.collectAsState()
+    val chartPoints by detailsViewModel.chartData.collectAsState()
+    val selectedDays by detailsViewModel.selectedDays.collectAsState()
+
     val coin = coins.find { it.id == coinId }
 
     if (coin == null) {
-        // fallback enquanto carrega
         Text("Carregando...", color = Color.White)
         return
     }
 
-    val chartPoints by detailsViewModel.chartData.collectAsState()
-
     LaunchedEffect(coinId) {
-        detailsViewModel.startAutoUpdate(coinId)
+        detailsViewModel.startAutoUpdate(coinId, 1)
     }
+
+    val currentPrice = chartPoints.lastOrNull()?.second ?: coin.currentPrice
+    val priceChange = (coin.currentPrice ?: 0.0) / 100
+    val isUp = priceChange >= 0
+    val changeColor = if (isUp) Color(0xFF4CAF50) else Color(0xFFFF5252)
+    val changeIcon = if (isUp) "▲" else "▼"
 
     Column(
         modifier = Modifier
@@ -49,43 +55,75 @@ fun DetailsScreen(
             .padding(20.dp)
     ) {
 
-        // Cabeçalho com botão de voltar
         Row(verticalAlignment = Alignment.CenterVertically) {
+
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = Color.White)
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = Color.White
+                )
             }
 
             Spacer(Modifier.width(12.dp))
 
-            Box(
-                Modifier
-                    .size(40.dp)
-                    .background(Color(0xFFFFA726), shape = CircleShape)
+            AsyncImage(
+                model = coin.image,
+                contentDescription = coin.name,
+                modifier = Modifier.size(40.dp)
             )
 
             Spacer(Modifier.width(12.dp))
 
             Column {
-                Text(coin.name, color = Color.White, style = MaterialTheme.typography.titleMedium)
-                Text(coin.symbol.uppercase(), color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = coin.name,
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = coin.symbol.uppercase(),
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
 
-        Spacer(Modifier.height(30.dp))
+        Spacer(Modifier.height(10.dp))
 
-        Text(
-            text = "US$ ${coin.currentPrice}",
-            color = Color.White,
-            style = MaterialTheme.typography.headlineLarge
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "US$ ${String.format("%.2f", currentPrice)}",
+                color = Color.White,
+                style = MaterialTheme.typography.headlineLarge
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "$changeIcon ${String.format("%.2f", priceChange)}%",
+                color = changeColor,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        Spacer(Modifier.height(20.dp))
+
+        TimeSelector(
+            selectedDays = selectedDays,
+            onClick = { days -> detailsViewModel.startAutoUpdate(coinId, days) }
         )
 
-        Spacer(Modifier.height(25.dp))
+        Spacer(Modifier.height(20.dp))
 
         Card(
             colors = CardDefaults.cardColors(containerColor = Color(0xFF0F1A34)),
-            modifier = Modifier.fillMaxWidth().height(280.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(280.dp)
         ) {
-            CoinChartWithGrid(points = chartPoints)
+            CoinChartWithGrid(points = chartPoints, days = selectedDays)
         }
     }
 }

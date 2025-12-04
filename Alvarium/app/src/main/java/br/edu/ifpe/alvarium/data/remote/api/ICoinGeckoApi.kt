@@ -20,7 +20,7 @@ interface ICoinGeckoApi {
     suspend fun getMarketChart(
         @Path("id") id: String,
         @Query("vs_currency") vsCurrency: String = "usd",
-        @Query("days") days: Int = 7
+        @Query("days") days: Int = 1
     ): MarketChartResponseDTO
 
 }

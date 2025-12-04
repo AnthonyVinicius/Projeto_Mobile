@@ -1,9 +1,9 @@
 package br.edu.ifpe.alvarium.viewmodel
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.edu.ifpe.alvarium.domain.repository.IChartRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,21 +16,33 @@ class DetailsViewModel(
     private val _chartData = MutableStateFlow<List<Pair<Long, Double>>>(emptyList())
     val chartData: StateFlow<List<Pair<Long, Double>>> = _chartData
 
-    fun startAutoUpdate(coinId: String) {
-        viewModelScope.launch {
+    private val _selectedDays = MutableStateFlow(1)
+    val selectedDays: StateFlow<Int> = _selectedDays
+
+    private var autoUpdateJob: Job? = null
+
+    fun startAutoUpdate(coinId: String, days: Int = 1) {
+        _selectedDays.value = days
+        autoUpdateJob?.cancel() // evita múltiplos loops
+        autoUpdateJob = viewModelScope.launch {
             while (true) {
-                loadChart(coinId)
-                delay(5000)
+                loadChart(coinId, days)
+                delay(30000)
             }
         }
     }
 
-    private suspend fun loadChart(coinId: String) {
+    private suspend fun loadChart(coinId: String, days: Int) {
         try {
-            val data = repository.getChart(coinId)
-            _chartData.value = data
+            _chartData.value = repository.getChart(coinId, days)
         } catch (e: Exception) {
-            e.printStackTrace()
+            println("Erro ao atualizar gráfico: ${e.message}")
+            delay(15000)
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        autoUpdateJob?.cancel() // evita vazamento de memória
     }
 }
