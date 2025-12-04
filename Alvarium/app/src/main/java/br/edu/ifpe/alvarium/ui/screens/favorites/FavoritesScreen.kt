@@ -54,9 +54,14 @@ fun FavoritesScreen(onNavigateToDetails: (String) -> Unit) {
 
             val context = LocalContext.current
             val factory = AppViewModelFactory(context)
+
+            val coinViewModel: CoinViewModel = viewModel(factory = factory)
             val favoriteViewModel: FavoriteCoinViewModel = viewModel(factory = factory)
 
-            val favoriteCoins by favoriteViewModel.favorites.collectAsState()
+            val allCoins by coinViewModel.coins.collectAsState()
+            val favoriteIds by favoriteViewModel.favoriteCoinIds.collectAsState()
+
+            val favoriteCoins = allCoins.filter { it.id in favoriteIds }
 
             Text(
                 text = "Favoritos",
@@ -71,7 +76,11 @@ fun FavoritesScreen(onNavigateToDetails: (String) -> Unit) {
             )
 
             if (favoriteCoins.isEmpty()) {
-                Text("Você ainda não tem moedas favoritas.", color = Color.White)
+                if (allCoins.isEmpty()) {
+                    Text("Carregando moedas...", color = Color.White)
+                } else {
+                    Text("Você ainda não tem moedas favoritas.", color = Color.White)
+                }
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -82,18 +91,10 @@ fun FavoritesScreen(onNavigateToDetails: (String) -> Unit) {
                             name = coin.name,
                             acronym = coin.symbol.uppercase(),
                             price = "US$ ${coin.currentPrice}",
-                            imageUrl = coin.imageUrl,
+                            imageUrl = coin.image,
                             isFavorite = true,
                             onToggleFavorite = {
-                                favoriteViewModel.toggleFavorite(
-                                    Coin(
-                                        id = coin.id,
-                                        symbol = coin.symbol,
-                                        name = coin.name,
-                                        image = coin.imageUrl,
-                                        currentPrice = coin.currentPrice
-                                    )
-                                )
+                                favoriteViewModel.toggleFavorite(coin)
                             }
                         ) {
                             onNavigateToDetails(coin.id)

@@ -58,6 +58,7 @@ private fun MainScreenContent(
     val favoriteViewModel : FavoriteCoinViewModel =  viewModel(factory =  factory)
 
     val coins by viewModel.coins.collectAsState()
+    val favoriteIds by favoriteViewModel.favoriteCoinIds.collectAsState()
 
     Text(
         text = "Bem-vindo ao Alvarium!",
@@ -116,7 +117,7 @@ private fun MainScreenContent(
                     acronym = coin.symbol.uppercase(),
                     price = "US$ ${coin.currentPrice}",
                     imageUrl = coin.image,
-                    isFavorite = favoriteViewModel.isFavoriteState(coin.id),
+                    isFavorite = coin.id in favoriteIds,
                     onToggleFavorite = {
                         favoriteViewModel.toggleFavorite(coin)
                     }

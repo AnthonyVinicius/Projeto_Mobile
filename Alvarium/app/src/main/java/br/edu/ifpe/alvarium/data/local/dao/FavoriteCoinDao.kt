@@ -22,4 +22,7 @@ interface FavoriteCoinDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM favorite_coins WHERE id = :coinId)")
     suspend fun isFavorite(coinId: String): Boolean
+
+    @Query("SELECT id FROM favorite_coins")
+    fun getFavoriteIds(): Flow<List<String>>
 }
