@@ -7,8 +7,10 @@ import br.edu.ifpe.alvarium.data.local.AppDatabase
 import br.edu.ifpe.alvarium.data.remote.RetrofitInstance
 import br.edu.ifpe.alvarium.data.repository.ChartRepositoryImpl
 import br.edu.ifpe.alvarium.data.repository.CoinRepositoryImpl
+import br.edu.ifpe.alvarium.data.repository.ConverterRepositoryImpl
 import br.edu.ifpe.alvarium.data.repository.FavoriteRepositoryImpl
 import br.edu.ifpe.alvarium.viewmodel.CoinViewModel
+import br.edu.ifpe.alvarium.viewmodel.ConverterViewModel
 import br.edu.ifpe.alvarium.viewmodel.DetailsViewModel
 import br.edu.ifpe.alvarium.viewmodel.FavoriteCoinViewModel
 
@@ -35,6 +37,11 @@ class AppViewModelFactory(
             modelClass.isAssignableFrom(DetailsViewModel::class.java) -> {
                 val repo = ChartRepositoryImpl(api)
                 DetailsViewModel(repo) as T
+            }
+
+            modelClass.isAssignableFrom(ConverterViewModel::class.java) -> {
+                val repo = ConverterRepositoryImpl(api)
+                ConverterViewModel(repo) as T
             }
 
             else -> throw IllegalArgumentException("ViewModel desconhecido: $modelClass")

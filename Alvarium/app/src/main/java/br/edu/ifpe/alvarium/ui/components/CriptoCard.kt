@@ -20,8 +20,8 @@ fun CriptoCard(
     acronym: String,
     price: String,
     imageUrl: String? = null,
-    isFavorite: Boolean,                    // 👈 novo
-    onToggleFavorite: () -> Unit,           // 👈 novo
+    isFavorite: Boolean,
+    onToggleFavorite: () -> Unit,
     onClick: () -> Unit = {}
 ) {
 
@@ -70,7 +70,6 @@ fun CriptoCard(
                 color = Color(0xFF6F7CF6)
             )
 
-            // ⭐ ÍCONE DE FAVORITO
             IconButton(onClick = onToggleFavorite) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,

@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,43 +17,46 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import br.edu.ifpe.alvarium.ui.theme.AlvariumTheme
+import br.edu.ifpe.alvarium.viewmodel.CoinViewModel
+import br.edu.ifpe.alvarium.viewmodel.ConverterViewModel
+import br.edu.ifpe.alvarium.viewmodel.factory.AppViewModelFactory
+
 
 @Composable
-fun ConverterScreen() {
+fun ConverterScreen(
+    coinViewModel: CoinViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current)),
+    converterViewModel: ConverterViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current))
+) {
+    val coins by coinViewModel.coins.collectAsState()
+    val selectedCoinId by converterViewModel.selectedCoinId.collectAsState()
+    val convertedValue by converterViewModel.convertedValue.collectAsState()
 
-    val alvariumGradient = Brush.verticalGradient(
+    var quantity by remember { mutableStateOf("1") }
+    var menuExpanded by remember { mutableStateOf(false) }
+
+    val selectedCoin = coins.firstOrNull { it.id == selectedCoinId }
+
+    val gradient = Brush.verticalGradient(
         listOf(Color(0xFF0A0F2A), Color(0xFF12203F))
     )
 
     Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(alvariumGradient),
+        modifier = Modifier.fillMaxSize().background(gradient),
         color = Color.Transparent
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(WindowInsets.systemBars.asPaddingValues())
-                .padding(16.dp),
+            modifier = Modifier.fillMaxSize().padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
 
-            Text(
-                text = "Conversor",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.White
-            )
-
-            Text(
-                text = "Converta criptomoedas instantaneamente",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White.copy(alpha = 0.7f)
-            )
+            Text("Conversor", style = MaterialTheme.typography.headlineMedium, color = Color.White)
+            Text("Converta criptomoedas em tempo real", color = Color.White.copy(alpha = 0.7f))
 
             Surface(
                 modifier = Modifier.fillMaxWidth(),
@@ -60,42 +64,91 @@ fun ConverterScreen() {
                 color = Color(0xFF152342).copy(alpha = 0.65f),
                 border = BorderStroke(1.dp, Color.White.copy(alpha = 0.10f))
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
 
-                    CryptoSelector(
-                        title = "De (Crypto)",
-                        icon = "B",
-                        name = "Bitcoin",
-                        code = "BTC"
-                    )
+                Column(Modifier.padding(20.dp)) {
 
-                    Spacer(Modifier.height(20.dp))
+                    // ---- SELECTOR DE MOEDAS ----
+                    Text("De (Crypto)", color = Color.White.copy(alpha = 0.7f))
 
-                    QuantityInput()
+                    Box {
+                        OutlinedTextField(
+                            value = selectedCoin?.name ?: "Selecione...",
+                            onValueChange = {},
+                            readOnly = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(20.dp),
+                            trailingIcon = {
+                                IconButton(onClick = { menuExpanded = true }) {
+                                    Icon(Icons.Default.ArrowDropDown, "", tint = Color.White)
+                                }
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFF6F7CF6),
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.10f),
+                                focusedContainerColor = Color(0xFF152342).copy(alpha = 0.65f),
+                                unfocusedContainerColor = Color(0xFF152342).copy(alpha = 0.65f),
+                                cursorColor = Color.White
+                            )
+                        )
 
-                    Spacer(Modifier.height(20.dp))
-
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        SwapButton()
+                        DropdownMenu(
+                            expanded = menuExpanded,
+                            onDismissRequest = { menuExpanded = false },
+                            modifier = Modifier.background(Color(0xFF152342))
+                        ) {
+                            coins.forEach { coin ->
+                                DropdownMenuItem(
+                                    text = { Text("${coin.name} (${coin.symbol.uppercase()})", color = Color.White) },
+                                    onClick = {
+                                        converterViewModel.selectCoin(coin.id)
+                                        menuExpanded = false
+                                    }
+                                )
+                            }
+                        }
                     }
 
                     Spacer(Modifier.height(20.dp))
 
-                    CryptoSelector(
-                        title = "Para (Moeda)",
-                        icon = "R$",
-                        name = "Real Brasileiro",
-                        code = "BRL"
+                    // ---- QUANTIDADE ----
+                    OutlinedTextField(
+                        value = quantity,
+                        onValueChange = { if (it.matches(Regex("\\d*\\.?\\d*"))) quantity = it },
+                        label = { Text("Quantidade", color = Color.White.copy(alpha = 0.7f)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF6F7CF6),
+                            unfocusedBorderColor = Color.White.copy(alpha = 0.10f),
+                            focusedContainerColor = Color(0xFF152342).copy(alpha = 0.65f),
+                            unfocusedContainerColor = Color(0xFF152342).copy(alpha = 0.65f),
+                        ),
+                        modifier = Modifier.fillMaxWidth()
                     )
 
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(20.dp))
 
+                    // ---- BOTAO DE CONVERTER ----
+                    Button(
+                        onClick = {
+                            val q = quantity.toDoubleOrNull() ?: 1.0
+                            converterViewModel.convert(q)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF6F7CF6)
+                        )
+                    ) {
+                        Text("Converter")
+                    }
+
+                    Spacer(Modifier.height(20.dp))
+
+                    // ---- RESULTADO ----
                     ConvertedCard(
-                        value = "R$ 483.366,97",
-                        rate = "1 BTC = R$ 483.366,97"
+                        value = convertedValue,
+                        rate = "1 ${selectedCoin?.symbol?.uppercase()} = ???"
                     )
                 }
             }

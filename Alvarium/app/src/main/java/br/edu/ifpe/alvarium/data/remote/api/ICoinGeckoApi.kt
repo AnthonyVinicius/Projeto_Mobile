@@ -23,4 +23,10 @@ interface ICoinGeckoApi {
         @Query("days") days: Int = 1
     ): MarketChartResponseDTO
 
+    @GET("coins/markets")
+    suspend fun getCoinById(
+        @Query("vs_currency") vsCurrency: String,
+        @Query("ids") ids: String
+    ): List<CoinDTO>
+
 }
