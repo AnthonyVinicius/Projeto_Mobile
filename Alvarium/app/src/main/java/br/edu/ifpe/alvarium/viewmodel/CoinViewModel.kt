@@ -36,7 +36,6 @@ class CoinViewModel(
             _coins.value = repository.getCoins()
         } catch (e: Exception) {
             Log.e("CoinViewModel", "Erro: ${e.message}")
-            delay(30000)
         }
     }
 }
