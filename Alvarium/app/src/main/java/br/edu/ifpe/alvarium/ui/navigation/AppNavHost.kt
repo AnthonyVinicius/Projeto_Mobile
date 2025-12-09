@@ -12,6 +12,7 @@ import br.edu.ifpe.alvarium.ui.screens.converter.ConverterScreen
 import br.edu.ifpe.alvarium.ui.screens.details.DetailsScreen
 import br.edu.ifpe.alvarium.ui.screens.favorites.FavoritesScreen
 import br.edu.ifpe.alvarium.ui.screens.main.MainScreen
+import br.edu.ifpe.alvarium.ui.screens.splash.SplashScreen
 
 
 @Composable
@@ -19,8 +20,16 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
 
     NavHost(
         navController,
-        startDestination = BottomNavItem.Home.route
+        startDestination = "splash"
     ) {
+        composable("splash") {
+            SplashScreen(onNavigateToHome = {
+                navController.navigate(BottomNavItem.Home.route) {
+                    popUpTo("splash") { inclusive = true }
+                }
+            })
+        }
+
         composable(BottomNavItem.Home.route) {
             MainScreen(
                 onNavigateToDetails = { acronym ->
