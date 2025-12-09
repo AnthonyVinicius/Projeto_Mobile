@@ -21,6 +21,7 @@ import br.edu.ifpe.alvarium.ui.components.CriptoCard
 import br.edu.ifpe.alvarium.ui.theme.AlvariumTheme
 import br.edu.ifpe.alvarium.viewmodel.FavoriteCoinViewModel
 import br.edu.ifpe.alvarium.viewmodel.factory.AppViewModelFactory
+import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
 fun MainScreen(
@@ -55,7 +56,7 @@ private fun MainScreenContent(
     val context = LocalContext.current
     val factory = AppViewModelFactory(context)
     val viewModel: CoinViewModel = viewModel(factory = factory)
-    val favoriteViewModel : FavoriteCoinViewModel =  viewModel(factory =  factory)
+    val favoriteViewModel: FavoriteCoinViewModel = viewModel(factory = factory)
 
     val coins by viewModel.coins.collectAsState()
     val favoriteIds by favoriteViewModel.favoriteCoinIds.collectAsState()
@@ -74,12 +75,14 @@ private fun MainScreenContent(
 
     var search by remember { mutableStateOf("") }
 
-    // INPUT PADRONIZADO
     OutlinedTextField(
         value = search,
         onValueChange = { search = it },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp),
         placeholder = { Text("Buscar criptomoeda...") },
+        textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
         singleLine = true,
         leadingIcon = {
             Icon(
@@ -88,13 +91,15 @@ private fun MainScreenContent(
                 tint = Color.White.copy(alpha = 0.7f)
             )
         },
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color(0xFF6F7CF6),
             unfocusedBorderColor = Color.White.copy(alpha = 0.10f),
-            focusedContainerColor = Color(0xFF152342).copy(alpha = 0.65f),
+            focusedContainerColor = Color(0xFF152342).copy(alpha = 0.75f),
             unfocusedContainerColor = Color(0xFF152342).copy(alpha = 0.65f),
-            cursorColor = Color.White
+            cursorColor = Color.White,
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White
         )
     )
 
@@ -104,14 +109,19 @@ private fun MainScreenContent(
         color = MaterialTheme.colorScheme.onBackground
     )
 
-    if (coins.isEmpty()) {
-        Text("Carregando moedas...", color = Color.White)
+    val filteredCoins = coins.filter {
+        it.name.contains(search, ignoreCase = true) ||
+                it.symbol.contains(search, ignoreCase = true)
+    }
+
+    if (filteredCoins.isEmpty()) {
+        Text("Nenhuma moeda encontrada...", color = Color.White)
     } else {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(coins) { coin ->
+            items(filteredCoins) { coin ->
                 CriptoCard(
                     name = coin.name,
                     acronym = coin.symbol.uppercase(),
@@ -128,8 +138,6 @@ private fun MainScreenContent(
         }
     }
 }
-
-
 
 @Preview(showBackground = true)
 @Composable

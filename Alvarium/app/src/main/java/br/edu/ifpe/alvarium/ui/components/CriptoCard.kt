@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
@@ -20,14 +21,13 @@ fun CriptoCard(
     acronym: String,
     price: String,
     imageUrl: String? = null,
-    isFavorite: Boolean,                    // 👈 novo
-    onToggleFavorite: () -> Unit,           // 👈 novo
+    isFavorite: Boolean,
+    onToggleFavorite: () -> Unit,
     onClick: () -> Unit = {}
 ) {
 
     Surface(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         onClick = onClick,
         shape = RoundedCornerShape(20.dp),
         color = Color(0xFF152342).copy(alpha = 0.65f),
@@ -41,24 +41,30 @@ fun CriptoCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            if (imageUrl != null) {
+            imageUrl?.let {
                 AsyncImage(
-                    model = imageUrl,
+                    model = it,
                     contentDescription = null,
                     modifier = Modifier.size(42.dp)
                 )
             }
 
-            Column {
+            Column(
+                modifier = Modifier.widthIn(max = 160.dp)
+            ) {
                 Text(
                     text = name,
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.White
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = acronym,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF8E9BBF)
+                    color = Color(0xFF8E9BBF),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
@@ -67,10 +73,11 @@ fun CriptoCard(
             Text(
                 text = price,
                 style = MaterialTheme.typography.titleSmall,
-                color = Color(0xFF6F7CF6)
+                color = Color(0xFF6F7CF6),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
-            // ⭐ ÍCONE DE FAVORITO
             IconButton(onClick = onToggleFavorite) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
