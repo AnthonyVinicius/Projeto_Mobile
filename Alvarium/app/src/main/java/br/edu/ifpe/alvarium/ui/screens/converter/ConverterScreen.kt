@@ -67,7 +67,6 @@ fun ConverterScreen(
 
                 Column(Modifier.padding(20.dp)) {
 
-                    // ---- SELECTOR DE MOEDAS ----
                     Text("De (Crypto)", color = Color.White.copy(alpha = 0.7f))
 
                     Box {
@@ -110,7 +109,6 @@ fun ConverterScreen(
 
                     Spacer(Modifier.height(20.dp))
 
-                    // ---- QUANTIDADE ----
                     OutlinedTextField(
                         value = quantity,
                         onValueChange = { if (it.matches(Regex("\\d*\\.?\\d*"))) quantity = it },
@@ -128,7 +126,6 @@ fun ConverterScreen(
 
                     Spacer(Modifier.height(20.dp))
 
-                    // ---- BOTAO DE CONVERTER ----
                     Button(
                         onClick = {
                             val q = quantity.toDoubleOrNull() ?: 1.0
@@ -145,7 +142,6 @@ fun ConverterScreen(
 
                     Spacer(Modifier.height(20.dp))
 
-                    // ---- RESULTADO ----
                     ConvertedCard(
                         value = convertedValue,
                         rate = "1 ${selectedCoin?.symbol?.uppercase()} = ???"
