@@ -1,4 +1,4 @@
-# Acompanhamento e Conversão de Criptomoedas
+# Acompanhamento de Criptomoedas
 
 Aplicativo mobile desenvolvido em **Kotlin** utilizando **Jetpack Compose** para criar uma interface moderna, fluida e intuitiva.
 O objetivo do projeto é permitir que qualquer usuário acompanhe o valor das principais criptomoedas, tudo de forma simples e acessível.
